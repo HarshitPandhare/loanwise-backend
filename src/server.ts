@@ -15,13 +15,15 @@ import { profileRouter } from "./routes/profile";
 import { toolsRouter } from "./routes/tools";
 import { userRouter } from "./routes/user";
 import { webhookRouter } from "./routes/webhooks";
+import { educationLoanRouter } from "./routes/educationLoan";
+import { profileRouter } from "./routes/profile";
+import { toolsRouter } from "./routes/tools";
+
+import { requireAuth } from "@clerk/express";
+import bodyParser from "body-parser";
 import { requireCompleteProfile } from "./middleware/requireCompleteProfile";
 
-// 🔍 TEMP DEBUG (remove later)
-console.log("ENV CHECK:", {
-  PORT: process.env.PORT,
-  MONGO_URI: process.env.MONGO_URI,
-});
+dotenv.config();
 
 const app = express();
 
@@ -38,6 +40,7 @@ app.get("/", (_req, res) => {
 
 app.use(seedRouter);
 app.use(eligibilityRouter);
+app.use(educationLoanRouter);
 
 // ---------- Webhook (PUBLIC + RAW BODY) ----------
 app.use(
@@ -51,6 +54,13 @@ app.use("/api/user", requireAuth(), userRouter);
 app.use("/api", requireAuth(), profileRouter);
 app.use("/api", requireAuth(), eligibilityRouter);
 app.use("/api", businessLoanRouter);
+
+app.use(
+  "/api/tools",
+  requireAuth(),
+  requireCompleteProfile,
+  toolsRouter
+);
 
 app.use(
   "/api/tools",
