@@ -7,9 +7,13 @@ import { seedRouter } from "./routes/seed";
 import { eligibilityRouter } from "./routes/eligibility";
 import { userRouter } from "./routes/user";
 import { webhookRouter } from "./routes/webhooks";
+import { educationLoanRouter } from "./routes/educationLoan";
+import { profileRouter } from "./routes/profile";
+import { toolsRouter } from "./routes/tools";
 
 import { requireAuth } from "@clerk/express";
 import bodyParser from "body-parser";
+import { requireCompleteProfile } from "./middleware/requireCompleteProfile";
 
 dotenv.config();
 
@@ -27,6 +31,7 @@ app.get("/", (_req, res) => {
 
 app.use(seedRouter);
 app.use(eligibilityRouter);
+app.use(educationLoanRouter);
 
 // ---------- Webhook (must stay PUBLIC + RAW BODY) ----------
 app.use(
@@ -37,7 +42,15 @@ app.use(
 
 // ---------- Protected Routes ----------
 app.use("/api/user", requireAuth(), userRouter);
+app.use("/api", requireAuth(), profileRouter);
 app.use("/api", requireAuth(), eligibilityRouter);
+
+app.use(
+  "/api/tools",
+  requireAuth(),
+  requireCompleteProfile,
+  toolsRouter
+);
 
 // ---------- Start Server ----------
 const PORT = process.env.PORT || 8000;
