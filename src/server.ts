@@ -16,6 +16,10 @@ import { toolsRouter } from "./routes/tools";
 import { userRouter } from "./routes/user";
 import { webhookRouter } from "./routes/webhooks";
 import { educationLoanRouter } from "./routes/educationLoan";
+import { personalLoanRouter } from "./routes/personalLoan";
+import { homeLoanRouter } from "./routes/homeLoan";
+import { vehicleLoanRouter } from "./routes/vehicleLoan";
+import { businessLoanRouter } from "./routes/businessLoan";
 import { profileRouter } from "./routes/profile";
 import { toolsRouter } from "./routes/tools";
 
@@ -27,7 +31,10 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:8080'],
+  credentials: true
+}));
 app.use(express.json());
 
 // ✅ env is now loaded correctly
@@ -41,6 +48,10 @@ app.get("/", (_req, res) => {
 app.use(seedRouter);
 app.use(eligibilityRouter);
 app.use(educationLoanRouter);
+app.use(personalLoanRouter);
+app.use(homeLoanRouter);
+app.use(vehicleLoanRouter);
+app.use(businessLoanRouter);
 
 // ---------- Webhook (PUBLIC + RAW BODY) ----------
 app.use(
