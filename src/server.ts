@@ -9,6 +9,7 @@ import { profileRouter } from "./routes/profile";
 import { toolsRouter } from "./routes/tools";
 import { userRouter } from "./routes/user";
 import { webhookRouter } from "./routes/webhooks";
+import { homeLoanRouter } from "./routes/homeloan";
 
 import { requireAuth } from "@clerk/express";
 import bodyParser from "body-parser";
@@ -30,6 +31,7 @@ app.get("/", (_req, res) => {
 
 app.use(seedRouter);
 app.use(eligibilityRouter);
+app.use(homeLoanRouter);
 
 // ---------- Webhook (must stay PUBLIC + RAW BODY) ----------
 app.use(
@@ -42,6 +44,7 @@ app.use(
 app.use("/api/user", requireAuth(), userRouter);
 app.use("/api", requireAuth(), profileRouter);
 app.use("/api", requireAuth(), eligibilityRouter);
+app.use("/api", requireAuth(), homeLoanRouter);
 
 
 app.use(
