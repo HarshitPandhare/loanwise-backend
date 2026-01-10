@@ -1,10 +1,18 @@
+import "dotenv/config"; // ✅ MUST be first, no function call
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import bodyParser from "body-parser";
+import { requireAuth } from "@clerk/express";
+import { businessLoanRouter } from "./routes/business";
+
+
 import { connectDB } from "./config/db";
 
 import { seedRouter } from "./routes/seed";
 import { eligibilityRouter } from "./routes/eligibility";
+import { profileRouter } from "./routes/profile";
+import { toolsRouter } from "./routes/tools";
 import { userRouter } from "./routes/user";
 import { webhookRouter } from "./routes/webhooks";
 import { educationLoanRouter } from "./routes/educationLoan";
@@ -22,6 +30,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ✅ env is now loaded correctly
 connectDB();
 
 // ---------- Public Routes ----------
@@ -33,7 +42,7 @@ app.use(seedRouter);
 app.use(eligibilityRouter);
 app.use(educationLoanRouter);
 
-// ---------- Webhook (must stay PUBLIC + RAW BODY) ----------
+// ---------- Webhook (PUBLIC + RAW BODY) ----------
 app.use(
   "/api/webhooks",
   bodyParser.raw({ type: "application/json" }),
@@ -44,6 +53,14 @@ app.use(
 app.use("/api/user", requireAuth(), userRouter);
 app.use("/api", requireAuth(), profileRouter);
 app.use("/api", requireAuth(), eligibilityRouter);
+app.use("/api", businessLoanRouter);
+
+app.use(
+  "/api/tools",
+  requireAuth(),
+  requireCompleteProfile,
+  toolsRouter
+);
 
 app.use(
   "/api/tools",
